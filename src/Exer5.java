@@ -18,11 +18,15 @@ necessários e ao menos os métodos para:
 
 import java.util.Scanner;
 
+class Pessoa{
+    protected String nome, endereco, RG, telefone, nascimento; // protected é usado para permitir acesso a atributos e metodos que implementam a classe principal - ex: classe aluno terá acesso aos atributos da classe pessoa
+}
+
 // classe
-class Aluno {
+class Aluno extends Pessoa{
     // atributos
-        String nome, endereco, RA, RG, telefone, nascimento;
-        double CR;
+    private String RA;
+    private double CR;
     
     // metodos
 
@@ -37,6 +41,15 @@ class Aluno {
         this.nascimento = nascimento;
         this.CR = CR;
     }
+    
+    // usado para acessar variaveis privates
+    public String getRa(){
+        return this.RA;
+    }
+
+    public double getCR(){
+        return this.CR;
+    }
 
     // metodos 
     public void exibir_aluno(){
@@ -47,33 +60,38 @@ class Aluno {
         System.out.printf("Telefone: %s\n", telefone);
         System.out.printf("Nascimento: %s\n", nascimento);
         System.out.printf("CR: %.2f\n", CR);
-
     }
-
 }
 
 public class Exer5 {
-    Aluno[] cadastro = new Aluno[100]; // vetor de alunos da classe Aluno
-    int total_alunos = 0; // contador de alunos cadastrados
 
-    int menu(Scanner scan){
+    private static int menu(Scanner scan){
         int op;
         do { 
             System.out.printf("selecione a opcao:\n\n");
             System.out.printf("0 - sair do programa.\n");
             System.out.printf("1 - inserir um novo aluno no cadastro.\n");
             System.out.printf("2 - buscar aluno por RA.\n");
-            System.out.printf("3 - exibir dados.\n");
+            System.out.printf("3 - exibir dados de alunos.\n");
             op = scan.nextInt();
         } while (op != 0 && op != 1 && op != 2 && op != 3);
         return op;
     }
-    void inserir_aluno(Scanner scan){
+
+    private static void inserir_aluno(Aluno[] cadastro, int total_alunos, Scanner scan){
+
+        if (total_alunos >= 100) {
+            System.out.println("O cadastro esta cheio!");
+            return;
+        }
+
+        scan.nextLine();
+
         System.out.print("digite o nome do aluno: ");
-        String nome = scan.next();
+        String nome = scan.nextLine();
 
         System.out.print("digite o endereco do aluno: ");
-        String endereco = scan.next();
+        String endereco = scan.nextLine();
 
         System.out.print("digite o RA do aluno: ");
         String RA = scan.next();
@@ -95,28 +113,17 @@ public class Exer5 {
         total_alunos++;
     }
 
-    public void exibir_aluno(){
-        System.out.printf("Nome: %s \n", nome);
-        System.out.printf("Endereco: %s \n ", endereco);
-        System.out.printf("RA: %s \n", RA);
-        System.out.printf("RG: %s \n", RG);
-        System.out.printf("Telefone: %s \n", telefone);
-        System.out.printf("Nascimento: %s \n", nascimento);
-        System.out.printf("CR: %.2f \n", CR);
-        System.out.println();
-    }
-
-
     public static void main(String[] args){
         try(Scanner scan = new Scanner(System.in)){
-            Exer5 exer5 = new Exer5(); // objeto da classe Exer5
+            Aluno[] cadastro = new Aluno[100]; // vetor de alunos da classe Aluno
+            int total_alunos = 0; // contador de alunos cadastrados
             
             int op;
             do {
             // exer5.menu(scan); pois o método menu é um método de instancia dentro da classe Exer5
-            switch (op = exer5.menu(scan)){ 
+            switch (op = menu(scan)){ 
                 case 1:
-                    exer5.inserir_aluno(scan);
+                    inserir_aluno(cadastro, total_alunos, scan);
                     break;
                 
                 case 2:
@@ -124,9 +131,9 @@ public class Exer5 {
                     String RA = scan.next();
                     boolean encontrado = false;
 
-                    for(int i=0; i<exer5.total_alunos; i++){
-                        if(RA.equals(exer5.cadastro[i].RA)){
-                            exer5.cadastro[i].exibir_aluno();
+                    for(int i=0; i<total_alunos; i++){
+                        if(RA.equals(cadastro[i].getRa())){
+                            cadastro[i].exibir_aluno();
                             encontrado = true;
                             break;
                         } 
@@ -135,7 +142,59 @@ public class Exer5 {
                     if (!encontrado){
                         System.out.println("RA nao encontrado.");
                     }
-                    
+                    break;
+
+                case 3: 
+                int opcao;
+                    do {
+                        System.out.printf("selecione a opcao:\n\n");
+                        System.out.printf("0 - voltar ao menu principal.\n");
+                        System.out.printf("1 - ordenar por RA.\n");
+                        System.out.printf("2 - ordenar por nome.\n");
+                        System.out.printf("3 - ordenar por CR.\n");
+                        opcao = scan.nextInt();
+
+                    } while(opcao != 0 && opcao != 1 && opcao != 2 && opcao != 3);
+                
+                     if(opcao ==1){
+                            for(int i =0; i<total_alunos; i++){
+                                for(int j=i+1; j<total_alunos; j++){
+                                    if(cadastro[i].getRa().compareTo(cadastro[j].getRa()) > 0){
+                                        Aluno aux = cadastro[i];
+                                        cadastro[i] = cadastro[j];
+                                        cadastro[j] = aux;
+                                    }
+                                }
+                            }   
+                     } else if(opcao == 2){
+                            for(int i=0;i<total_alunos;i++){
+                                for(int j=i+1;j<total_alunos;j++){
+                                    if(cadastro[i].nome.compareTo(cadastro[j].nome)>0){
+                                        Aluno aux = cadastro[i];
+                                        cadastro[i] = cadastro[j];
+                                        cadastro[j] = aux;
+                                    }
+                                }
+                            }
+                        } else if(opcao == 3){
+                          
+                            for(int i=0; i<total_alunos; i++){
+                                for(int j= i+1; j<total_alunos;j++){
+                                    if(cadastro[i].getCR() > cadastro[j].getCR()){
+                                        Aluno aux = cadastro[i];
+                                        cadastro[i] = cadastro[j];  
+                                        cadastro[j] = aux;
+                                    }
+                                }
+                            } 
+                    } else {
+                        break;
+                    }
+                    for(int i=0; i<total_alunos; i++){
+                        cadastro[i].exibir_aluno();
+                    }
+
+                break;
                 default:
                     throw new AssertionError();
                 }
